@@ -23,9 +23,9 @@ end
 % x= x=x0+ Vr
 V=null(Aeq); r=V\(x-x0); 
 % 
-r= General_unconstrained_quantization(r, N, qtype);
+% r= General_unconstrained_quantization(r, N, qtype);
 % keyboard
-% r = Unconstraint_quantizer(r,N);
+r = Unconstraint_quantizer(r,N);
 dis_ineq=bineq-Aineq*(x0+V*r);
 [t,ind]=min(dis_ineq);
 if t>1/N

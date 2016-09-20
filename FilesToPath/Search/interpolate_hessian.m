@@ -25,7 +25,7 @@ end
 
 
 % Scaled polyharmonoic spline
-if inter_par{1}==7
+if inter_par{1}==7 || inter_par{1}==8
     w=inter_par{2}; 
     xi=inter_par{4};
     a= inter_par{7}; S= diag(a);

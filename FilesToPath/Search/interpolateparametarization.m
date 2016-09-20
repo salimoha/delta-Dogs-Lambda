@@ -221,18 +221,48 @@ inter_par{4}=theta(1:n);
 inter_par{5}=diag(theta(n+1:2*n));
 end
 %% new interpolation Scaled polyharmonic spline
-if inter_method == 7
+if inter_method == 7 || inter_method == 8
+%     keyboard
 a = ones(size(xi,1),1);
-lambda = 0.1;
+lambda = 1;
 % keyboard
-for i=1:1:10
+for i=1:20
 %TODO: FIX THE ITER MAX  
     %    [inter_par, a]  = Scale_interpar( xi,yi,a0, lambda); % method1
 [inter_par,a]  = Scale_interpar( xi,yi,a, lambda); %method2
+inter_par{1}=inter_method;
+lambda = lambda/2;
+end
+if inter_method==8
+%     keyboard
+epsFun = yi-y0;
+inter_par{8}=epsFun;
+end
+end
+%% new interpolation Scaled and dimension reduction polyharmonic spline
+if inter_method == 68
+a = ones(size(xi,1),1);
+lambda = 1;
+% keyboard
+for i=1:20
+%TODO: FIX THE ITER MAX  
+    %    [inter_par, a]  = Scale_interpar( xi,yi,a0, lambda); % method1
+[inter_par,a]  = Scale_interpar( xi,yi,a, lambda); %method2
+epsFun = min(abs(yi-y0));
+% keyboard
+% TODO 0.1 should be scaled by dimensions
+a_c = a(a>0.1);
+inter_par{7}=a_c;
+inter_par{1}=68;
+
 lambda = lambda/2;
 end
 
 end
+
+
+
+
 end
 
 %% Scaled Polyharmonic Spline
@@ -241,20 +271,22 @@ function [ inter_par,a ] = Scale_interpar( xi,yi,a0, lambda0)
 % polyharmonic spline interpolation
 global lambda
 lambda = lambda0;
-if nargin < 3
-a0=ones(size(xi,1),1);
+n=size(xi,1);
+if nargin <3
+a0=ones(n,1);
 lambda =1;
 end
 % keyboard
-n=size(xi,1);
+
 % options = optimoptions(@fmincon,'Algorithm','sqp','Display','iter-detailed' );
 options = optimoptions(@fmincon,'Algorithm','sqp');
-options = optimoptions(options,'GradObj','on' ,'Display','off');
-% lb = [0;0]; ub = [n;n];   % No upper or lower bounds for a
-lb=zeros(1,n); ub = ones(1,n)*n;
+options = optimoptions(options,'GradObj','on');
+lb = zeros(n,1); ub = ones(n,1)*n;   % No upper or lower bounds
+% for ii=1:20
 fung = @(a)DiagonalScaleCost(a,xi,yi);
 % keyboard
 [a,fval] = fmincon(fung,a0,[],[],ones(1,n),n,lb,ub,[],options);
+% end
 [ff,gf,inter_par] = DiagonalScaleCost(a,xi,yi);
 
 end
@@ -262,6 +294,7 @@ end
 function [ Cost, gradCost, inter_par ] = DiagonalScaleCost( a, xi, yi)
 %The Loss (cost) function that  how smooth the interpolating funciton is.
 global lambda
+% keyboard
 inter_par= interpolateparametarization_scaled(xi,yi,a,1, lambda);
 w = inter_par{2};
 Cost =sum(w.^2);
@@ -286,7 +319,7 @@ end
 xi= xi1;
 yi=yi1;
 n=size(xi,1);
-%keyboard
+% keyboard
 % polyharmonic spline interpolation
 if inter_method==1
     N = size(xi,2); A = zeros(N,N);
@@ -303,7 +336,8 @@ A = [A V'; V zeros(n+1,n+1)];
 %%%wv = pinv(A)* [yi.'; zeros(n+1,1)]; % solve the associated linear system
 % keyboard
 wv = A\[yi.'; zeros(n+1,1)];
-% AA= A*A',  WV = AA\bb,   XX = A'*WV
+%
+% bb=[yi.'; zeros(n+1,1)], AA= A*A',  WV = AA\bb,   XX = A'*WV
 % err = A*XX-[yi.'; zeros(n+1,1)]
 inter_par{1}=1;
 inter_par{2} = wv(1:N); inter_par{3} = wv(N+1:N+n+1); 

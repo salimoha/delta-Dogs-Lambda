@@ -81,6 +81,8 @@ for k=1:length(S(1,:))                     %iterate through matrix of pts
             %             % Paul
             % %         case(3)
         case('An ')                        %An lattice, see Conway&Sloane
+%             keyboard
+            [~,B,plane]=init_DOGS(N,lattice);
             x=x.*scale.*sqrt(2);                    %scale to integers
             x=(plane'*x)';
             %             keyboard

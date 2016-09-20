@@ -1,4 +1,4 @@
-% Second Order Delta-Dogs:
+t% Second Order Delta-Dogs:
 % Algorithm with second order convergence property.
 % Constraints are simple bound constraints.
 % Dimenson:

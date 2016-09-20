@@ -35,7 +35,8 @@ if inter_par{1}==3
 end
 
 % scaled polyharmonoic spline
-if inter_par{1}==7
+if inter_par{1}==7 || inter_par{1}==8
+% keyboard
     w=inter_par{2}; v=inter_par{3};
     xi=inter_par{4};  a = inter_par{7}; H = diag(a);
     N = size(xi, 2);

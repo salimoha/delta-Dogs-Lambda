@@ -3,11 +3,14 @@
 % Constraints are simple bound constraints.
 % Dimenson:
 clear all; close all; clc
+%   run('./FilesToPath/addTopath.m')
 figure(1);clf;
 qtype=1;
-global n Ain bin y0 lattice scale
-n=2;
-lattice = 'Zn ';
+global n Ain bin y0 lattice  scale
+n=5;
+DELTA_MAX=1e-4*sqrt(n);
+
+lattice = 'Zn '; [~,B,plane]=init_DOGS(n,lattice);
 % xs = ones(n,1)*(-2.903);
 % objective function:
 % scaled to [0,1] domain
@@ -31,7 +34,7 @@ m=2*n;
 % maximum number of iterations:
 iter_max=100;
 % interpolation strategy:
-inter_method=1;
+inter_method=8;
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%
 % % Input the equality constraints:?????????
 % % Ain=[eye(n);-eye(n)]; bin=[bnd2 ;-bnd1];
@@ -45,7 +48,7 @@ inter_method=1;
 bs = 0.81; % interior
 A=[ones(1,n);-ones(1,n)]/sqrt(n); b=[ bs.*n/sqrt(n)];
 Ain=[eye(n);-eye(n);A]
-bin=[ones(n,1);ones(n,1);b;b]
+bin=[ones(n,1);zeros(n,1);b;b]
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 % length_scale=10;
 length_scale=1;
@@ -79,12 +82,14 @@ Nm=32;
 % Nm=100;
 %y00=0;
 %y00=0.02;
+  y0=y00;
 % Initialize constaints 
 %tol=0.05;
 rho=1;
-for kk=1:5
+for kk=1:8
 for k=1:iter_max
 %     keyboard
+tic;
     stop=0;
     inter_par= interpolateparametarization(xE,yE,inter_method,interpolate_index);
     %y0=10;
@@ -151,7 +156,7 @@ for k=1:iter_max
       ym=fun(x);
        
         %   true=check_add_point(x,ym,[xE xU],inter_par,newadd,size(xE,2));
-           if mindis(x,xE)<5e-16
+           if mindis(x,xE)<DELTA_MAX
              %  keyboard
                break
            end
@@ -169,24 +174,37 @@ for k=1:iter_max
            pE=[pE interpolate_val(x,inter_par)];
 
    % illusteration
-     figure(gcf)
-    %subplot(2,1,1)
-    plot(1:length(yE),yE,'-','linewidth',2.5)
-    xlabel('number of fun eval')
-    ylabel('fun eval')
-    grid on
-    set(gca,'FontSize',18)
-    %, 1:length(yE),pE,'--')
-    %plot(1:length(yE),1./(exp(yE)-1),'-','linewidth',3)
-    ylim([0 200])
-    %ylim([-5 5])
-    %xlim([0 100])
-    %subplot(2,1,2)
-    %plot(xE')
-    %xlim([0 100])
+   
+    % plotting
+    figure(1)
+    subplot(2,1,1)
+    plot(1:length(yE(:)),yE,'-','linewidth',1.5)
+%         ylim([0 200])
+    subplot(2,1,2)
+    plot(xE(:,1:end)','linewidth',1.5)
     drawnow
-      %plot(xi(1,:)0,xi(2,:),'rs')
-           
+dt(k)=toc;
+disp(strcat('finished iteration....', num2str(k*(kk-1)+k,'%02d'), '... ymin = ', num2str(min(yE)) ))
+disp(strcat(' in ....  ', num2str(dt(k)), '... sec ' ))   
+
+%      figure(gcf)
+%     %subplot(2,1,1)
+%     plot(1:length(yE),yE,'-','linewidth',2.5)
+%     xlabel('number of fun eval')
+%     ylabel('fun eval')
+%     grid on
+%     set(gca,'FontSize',18)
+%     %, 1:length(yE),pE,'--')
+%     %plot(1:length(yE),1./(exp(yE)-1),'-','linewidth',3)
+%     ylim([0 200])
+%     %ylim([-5 5])
+%     %xlim([0 100])
+%     %subplot(2,1,2)
+%     %plot(xE')
+%     %xlim([0 100])
+%     drawnow
+%       %plot(xi(1,:)0,xi(2,:),'rs')
+%            
 end
 Nm=2*Nm;
 end
@@ -199,3 +217,20 @@ end
 %plot(6:length(yE),yE(6:end),'-','linewidth',1.5)
 %set(gca,'fontsize',15)
 %grid on
+
+
+
+% 
+% 
+%%%
+figure(1);
+subplot(2,1,1)
+ylim([0,200])
+% figure_to_publish(strcat('./results_Lambda/DD_Lambda_styb2_n_',num2str(n,'%02d'),'_',char(lattice)))
+% figure_to_publish(strcat('./results_Lambda/DD_Lambda_styb2_n_',num2str(n,'%02d'),'_',char(lattice)))
+[y_min,ind]=min(yE)
+[xE(:,ind),xs]
+% save(strcat('./results_Lambda/DD_Lambda_styb2_n_',num2str(n,'%02d'),'_','Dn_dual')) 
+
+% save(strcat('./results_Lambda/DD_Lambda_styb2_n_',num2str(n,'%02d'),'_',char(lattice), 'spinterpolation_bug')) 
+save(strcat('./results_Lambda/DD_Lambda_styb2_n_',num2str(n,'%02d'),'_',char(lattice), 'spinterpolation_bug')) 
