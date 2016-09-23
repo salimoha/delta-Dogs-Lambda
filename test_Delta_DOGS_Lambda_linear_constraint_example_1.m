@@ -6,13 +6,14 @@ clear all; close all; clc
 load Lambda
 global n Ain bin y0 lattice
 % for kk=[2,3,4,5,8]
-for kk=[6]
+for kk=[4]
 clear yE xE Nm 
 n=kk;
 figure(1);clf;
 qtype=0; iPlot=1; iSave=1;
 run('./FilesToPath/addTopath.m')
-minCoveringRadius = 5e-6;
+% minCoveringRadius = 5e-6;
+minCoveringRadius = 5e-3;
 % EXAMPLE = 'interior'; bs = 0.81; % interior
 EXAMPLE = 'activ'; bs=0.7903; % active on constraint
 %  n=3;
@@ -77,7 +78,7 @@ length_scale=max(bnd2-bnd1);
 % xU=vertex_find(Ain,bin,[],[]);
 xU=vertex_find(Ain,bin,lb,ub);
 % Calculate initial delta
-xE=(bnd1+0.5*(bnd2-bnd1));
+xE=(bnd1+0.45*(bnd2-bnd1));
 % xE=(sum(xU')/(n+1))';
 % initial points: the midpoint point and its neighber
 delta0=0.15*length_scale;
@@ -144,7 +145,9 @@ for kk=1:16
                 if interpolate_val(x,inter_par)<y0, break, end
                 
                 %      keyboard
-                [xq,xE,xU,newadd,success]=points_neighbers_find(xq,xE,xU);
+%                 [xq,xE,xU,newadd,success]=points_neighbers_find(xq,xE,xU);
+                
+                [xq,xE,xU,newadd,success]=points_neighbers_find_lambda(xq,xE,xU);
                 
                 
                 if success==1, break,
