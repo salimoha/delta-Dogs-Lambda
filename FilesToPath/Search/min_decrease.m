@@ -11,6 +11,11 @@ while 1
      break
  end
  x1=x0+a*(x-x0);
+ %added for better performance
+  if abs(interpolate_val(x1,inter_par)-y0) <1e-4
+     x=x1;
+ end
+ 
  if interpolate_val(x1,inter_par)<y0
      x=x1;
  else
